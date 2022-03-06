@@ -42,10 +42,10 @@ class Clients(Base):
 class Bands(Base):
     __tablename__ = 'bands'
 
-    name = Column(String, primary_key=True, autoincrement=True)
+    name = Column(String, primary_key=True)
 
 
-class ClientBands:
+class ClientBands(Base):
     __tablename__ = 'client_bands'
 
     id = Column(Integer, primary_key=True, autoincrement=True)

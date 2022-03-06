@@ -12,7 +12,7 @@ Session = sessionmaker(
 )
 
 
-def get_session():
+def get_session() -> Session:
     session = Session()
     try:
         yield session

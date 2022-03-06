@@ -1,13 +1,6 @@
 from fastapi import FastAPI
 
+from .api import router
+
 app = FastAPI()
-
-
-@app.get('/')
-def root():
-    return {'status': 'fine'}
-
-
-@app.get('/{word}')
-def word(word: str):
-    return {'message': f'{word}'}
+app.include_router(router)

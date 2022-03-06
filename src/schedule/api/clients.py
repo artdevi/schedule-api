@@ -1,9 +1,11 @@
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Response
+from sqlalchemy.orm import Session
+from starlette import status
 
-from ..database import Session
-from ..models.clients import Client
+from ..database import get_session
+from ..models.clients import ClientBase, Client
 from .. import tables
 
 router = APIRouter(
@@ -12,16 +14,31 @@ router = APIRouter(
 
 
 @router.get('/all', response_model=List[Client])
-def get_client_list():
-    session = Session()
-    clients = (
-        session
-        .query(tables.Clients)
-        .all()
-    )
+def get_client_list(session: Session = Depends(get_session)):
+    query = session.query(tables.Clients)
+    clients = query.all()
     return clients
 
 
-@router.get('/{id}')
-def get_user_by_id():
-    return {"message": id}
+@router.get('/{id}', response_model=Client)
+def get_client_by_id(id: int, session: Session = Depends(get_session)):
+    query = session.query(tables.Clients)
+    client = query.get(id)
+    return client
+
+
+@router.post('/', response_model=Client)
+def create_client(client_data: ClientBase, session: Session = Depends(get_session)):
+    client = tables.Clients(**client_data.dict())
+    session.add(client)
+    session.commit()
+    return client
+
+
+@router.delete('/{id}', response_model=Client)
+def delete_client(id: int, session: Session = Depends(get_session)):
+    query = session.query(tables.Clients)
+    client = query.get(id)
+    session.delete(client)
+    session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
