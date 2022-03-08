@@ -35,6 +35,16 @@ def create_client(client_data: ClientBase, session: Session = Depends(get_sessio
     return client
 
 
+@router.put('/{id}', response_model=Client)
+def update_client_data(id: int, client_data: ClientBase, session: Session = Depends(get_session)):
+    query = session.query(tables.Clients)
+    client = query.get(id)
+    for field, value in client_data:
+        setattr(client, field, value)
+    session.commit()
+    return client
+
+
 @router.delete('/{id}', response_model=Client)
 def delete_client(id: int, session: Session = Depends(get_session)):
     query = session.query(tables.Clients)
